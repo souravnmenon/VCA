@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 app.get("/:room", (req, res) => {
     res.render("index", { roomId: req.params.room });
 });
-// token = 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
+
 io.on("connection", (socket) => {
     socket.on("join-room", (roomId, userId, userName) => {
         socket.join(roomId);
