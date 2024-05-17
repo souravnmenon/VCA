@@ -13,6 +13,16 @@ let myStream
 navigator.mediaDevices.getUserMedia({audio:true,video:true}).then((stream) =>{
     myStream = stream;
     addVideoStream(myVideo,stream)
+    socket.on("user-connected",(userId) =>{
+        connectToNewUser(userId,stream)
+    });
+    peer.on("call",(call)=>{
+        call.answer(stream)
+        const video = document.createElement("video");
+        call.on("stream",(userVideoStream)=>{
+            addVideoStream(video,userVideoStream)
+        })
+    })
 })
 function addVideoStream(video,stream){
     video.srcObject = stream;
@@ -20,6 +30,14 @@ function addVideoStream(video,stream){
         video.play();
         $("#video_grid").append(video)
     });
+}
+
+function connectToNewUser(id,stream){
+    const call = peer.call(id,stream);
+    const video = document.createElement("video")
+    call.on("stream",(userVideoStream)=>{
+        addVideoStream(video,userVideoStream)
+    })
 }
 
 $(function () {
@@ -45,6 +63,38 @@ $(function () {
         if (e.key == "Enter" && $("#chat_message").val().length !== 0) {
             socket.emit("message", $("#chat_message").val());
             $("#chat_message").val("");
+        }
+    })
+
+    $("#stop_video").click(function () {
+        const enabled = myStream.getVideoTracks()[0].enabled
+        if(enabled){
+            myStream.getVideoTracks()[0].enabled = false
+            html = `<i class="fas fa-video-slash"></i>`
+            $("#stop_video").toggleClass("background_red")
+            $("#stop_video").html(html)
+        }
+        else {
+            myStream.getVideoTracks()[0].enabled = true
+            html = `<i class="fas fa-video"></i>`
+            $("#stop_video").toggleClass("background_red")
+            $("#stop_video").html(html)
+        }
+    })
+
+    $("#mute_button").click(function () {
+        const enabled = myStream.getAudioTracks()[0].enabled;
+        if(enabled){
+            myStream.getAudioTracks()[0].enabled = false
+            html = `<i class="fas fa-microphone-slash"></i>`
+            $("#mute_button").toggleClass("background_red")
+            $("#mute_button").html(html)
+        }
+        else {
+            myStream.getAudioTracks()[0].enabled = true
+            html = `<i class="fas fa-microphone"></i>`
+            $("#mute_button").toggleClass("background_red")
+            $("#mute_button").html(html)
         }
     })
 

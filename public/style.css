@@ -109,6 +109,10 @@
   background-color: var(--main-dark);
 }
 
+.background_red {
+  background-color: red;
+}
+
 video {
   height:300px;
   border-radius: 1rem;
