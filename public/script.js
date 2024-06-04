@@ -82,6 +82,27 @@ $(function () {
         }
     })
 
+    $("#invite_button").click(function () {
+        const to = prompt("Enter the email address.")
+        let data = {
+            url:window.location.href,
+            to:to
+        }
+        $.ajax({
+            url:"/send-mail",
+            type:"post",
+            data:JSON.stringify(data),
+            dataType:"json",
+            contentType:"applicaton/json",
+            success:function(result){
+                alert("Invite Sent!")
+            },
+            error:function(result){
+                console.log(result.responseJSON)
+            }
+        })
+    })
+
     $("#mute_button").click(function () {
         const enabled = myStream.getAudioTracks()[0].enabled;
         if(enabled){
